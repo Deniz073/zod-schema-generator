@@ -15,6 +15,7 @@ import { EnumValues } from "./enum-values";
 import { ArrayConfig } from "./array-config";
 import { ObjectConfig } from "./object-config";
 import { Switch } from "@/components/ui/switch";
+import { KeyValueConfig } from "./key-value-config";
 import type { SchemaField } from "@/lib/types";
 
 interface FieldBuilderProps {
@@ -52,6 +53,13 @@ export function FieldBuilder({ field, onChange }: FieldBuilderProps) {
               <SelectItem value="array">Array</SelectItem>
               <SelectItem value="object">Object</SelectItem>
               <SelectItem value="enum">Enum</SelectItem>
+              <SelectItem value="bigint">BigInt</SelectItem>
+              <SelectItem value="record">Record</SelectItem>
+              <SelectItem value="map">Map</SelectItem>
+              <SelectItem value="set">Set</SelectItem>
+              <SelectItem value="any">Any</SelectItem>
+              <SelectItem value="unknown">Unknown</SelectItem>
+              <SelectItem value="void">Void</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -74,6 +82,10 @@ export function FieldBuilder({ field, onChange }: FieldBuilderProps) {
             })
           }
         />
+      )}
+
+      {(field.type === 'record' || field.type === 'map') && (
+        <KeyValueConfig field={field} onChange={onChange} />
       )}
 
       <div className="flex items-center space-x-2">

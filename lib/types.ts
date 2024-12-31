@@ -1,10 +1,12 @@
+// lib/types.ts
 export interface ValidationRule {
   id: string;
   type: string;
   message: string;
   value: string;
   transform?: string;
-  elementType?: string; 
+  keyType?: string;  
+  valueType?: string; 
 }
 
 export interface SchemaField {
@@ -23,9 +25,11 @@ export interface SchemaField {
     isPassthrough?: boolean;
     pickOmitFields?: string[];
     pickOmitType?: 'pick' | 'omit';
-    elementType?: string; 
+    elementType?: string;
+    keyType?: string;
+    valueType?: string;
     isTuple?: boolean;
-    tupleTypes?: string[]; 
+    tupleTypes?: string[];
     isAsync?: boolean;
   };
 }

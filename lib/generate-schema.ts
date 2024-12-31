@@ -30,35 +30,65 @@ function generateValidations(field: SchemaField): string {
   const paramsString = params.length ? `, { ${params.join(', ')} }` : '';
   let schema = '';
 
-  // Handle array type
-  if (field.type === 'array') {
-    if (field.params.isTuple && field.params.tupleTypes?.length) {
-      schema = `z.tuple([${field.params.tupleTypes.map(t => `z.${t}()`).join(', ')}])`;
-    } else {
-      schema = `z.array(z.${field.params.elementType || 'string'}()${paramsString})`;
-    }
-  }
-  // Handle enum type
-  else if (field.type === 'enum' && field.params.enumValues?.length) {
-    schema = `z.enum([${field.params.enumValues.map(v => `"${v}"`).join(', ')}]${paramsString})`;
-  }
-  // Handle object type
-  else if (field.type === 'object') {
-    schema = `z.object({}${paramsString})`;
-    if (field.params.isStrict) schema += '.strict()';
-    if (field.params.isPassthrough) schema += '.passthrough()';
-    if (field.params.pickOmitFields?.length) {
-      schema += `.${field.params.pickOmitType || 'pick'}({${field.params.pickOmitFields.map(f => `${f}: true`).join(', ')
-        }})`;
-    }
-  }
-  // Handle union types
-  else if (field.params.unionTypes?.length) {
-    schema = `z.union([${field.params.unionTypes.map(t => `z.${t}()`).join(', ')}]${paramsString})`;
-  }
-  // Handle regular types
-  else {
-    schema = `z.${field.type}(${params.length ? `{ ${params.join(', ')} }` : ''})`;
+  switch (field.type) {
+    case 'array':
+      if (field.params.isTuple && field.params.tupleTypes?.length) {
+        schema = `z.tuple([${field.params.tupleTypes.map(t => `z.${t}()`).join(', ')}])`;
+      } else {
+        schema = `z.array(z.${field.params.elementType || 'string'}()${paramsString})`;
+      }
+      break;
+
+    case 'record':
+      schema = `z.record(z.${field.params.keyType || 'string'}(), z.${field.params.valueType || 'string'}()${paramsString})`;
+      break;
+
+    case 'map':
+      schema = `z.map(z.${field.params.keyType || 'string'}(), z.${field.params.valueType || 'string'}()${paramsString})`;
+      break;
+
+    case 'set':
+      schema = `z.set(z.${field.params.elementType || 'string'}()${paramsString})`;
+      break;
+
+    case 'bigint':
+      schema = `z.bigint(${params.length ? `{ ${params.join(', ')} }` : ''})`;
+      break;
+
+    case 'any':
+      schema = 'z.any()';
+      break;
+
+    case 'unknown':
+      schema = 'z.unknown()';
+      break;
+
+    case 'void':
+      schema = 'z.void()';
+      break;
+
+    case 'enum':
+      if (field.params.enumValues?.length) {
+        schema = `z.enum([${field.params.enumValues.map(v => `"${v}"`).join(', ')}]${paramsString})`;
+      }
+      break;
+
+    case 'object':
+      schema = `z.object({}${paramsString})`;
+      if (field.params.isStrict) schema += '.strict()';
+      if (field.params.isPassthrough) schema += '.passthrough()';
+      if (field.params.pickOmitFields?.length) {
+        schema += `.${field.params.pickOmitType || 'pick'}({${field.params.pickOmitFields.map(f => `${f}: true`).join(', ')
+          }})`;
+      }
+      break;
+
+    default:
+      if (field.params.unionTypes?.length) {
+        schema = `z.union([${field.params.unionTypes.map(t => `z.${t}()`).join(', ')}]${paramsString})`;
+      } else {
+        schema = `z.${field.type}(${params.length ? `{ ${params.join(', ')} }` : ''})`;
+      }
   }
 
   // Add validations
@@ -147,6 +177,32 @@ function generateValidations(field: SchemaField): string {
       case "async":
         schema += `.refine(async (val) => ${value}, ${addMessage})`;
         break;
+      case "min":
+        if (field.type === 'bigint') {
+          schema += `.min(BigInt(${value})${addMessage})`;
+        } else {
+          schema += `.min(${value}${addMessage})`;
+        }
+        break;
+      case "max":
+        if (field.type === 'bigint') {
+          schema += `.max(BigInt(${value})${addMessage})`;
+        } else {
+          schema += `.max(${value}${addMessage})`;
+        }
+        break;
+      case "multipleOf":
+        if (field.type === 'bigint') {
+          schema += `.multipleOf(BigInt(${value})${addMessage})`;
+        } else {
+          schema += `.multipleOf(${value}${addMessage})`;
+        }
+        break;
+      case "size":
+        if (field.type === 'set') {
+          schema += `.size(${value}${addMessage})`;
+        }
+        break;  
     }
   });
 

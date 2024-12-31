@@ -50,6 +50,20 @@ export function getValidationOptions(type: string): ValidationOption[] {
     enum: [
       { value: "values", label: "Enum Values" },
     ],
+    bigint: [
+      { value: "min", label: "Min Value" },
+      { value: "max", label: "Max Value" },
+      { value: "positive", label: "Positive" },
+      { value: "negative", label: "Negative" },
+      { value: "multipleOf", label: "Multiple Of" },
+    ],
+
+    set: [
+      { value: "min", label: "Min Size" },
+      { value: "max", label: "Max Size" },
+      { value: "size", label: "Exact Size" },
+      { value: "nonempty", label: "Non Empty" },
+    ],
   };
 
   return [...commonValidations, ...(typeSpecificValidations[type] || [])];
