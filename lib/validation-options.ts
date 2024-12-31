@@ -25,6 +25,13 @@ export function getValidationOptions(type: string): ValidationOption[] {
       { value: "trim", label: "Trim" },
       { value: "toLowerCase", label: "To Lower Case" },
       { value: "toUpperCase", label: "To Upper Case" },
+      { value: "datetime", label: "DateTime" },
+      { value: "ip", label: "IP Address" },
+      { value: "ipv4", label: "IPv4" },
+      { value: "ipv6", label: "IPv6" },
+      { value: "cuid", label: "CUID" },
+      { value: "cuid2", label: "CUID2" },
+      { value: "ulid", label: "ULID" },
     ],
     number: [
       { value: "min", label: "Min Value" },
@@ -57,12 +64,15 @@ export function getValidationOptions(type: string): ValidationOption[] {
       { value: "negative", label: "Negative" },
       { value: "multipleOf", label: "Multiple Of" },
     ],
-
     set: [
       { value: "min", label: "Min Size" },
       { value: "max", label: "Max Size" },
       { value: "size", label: "Exact Size" },
       { value: "nonempty", label: "Non Empty" },
+    ],
+    function: [
+      { value: "args", label: "Arguments" },
+      { value: "returns", label: "Return Type" },
     ],
   };
 

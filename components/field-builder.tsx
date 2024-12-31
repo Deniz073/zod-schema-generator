@@ -1,3 +1,4 @@
+// components/field-builder.tsx
 "use client";
 
 import { Input } from "@/components/ui/input";
@@ -14,8 +15,9 @@ import { FieldParams } from "./field-params";
 import { EnumValues } from "./enum-values";
 import { ArrayConfig } from "./array-config";
 import { ObjectConfig } from "./object-config";
-import { Switch } from "@/components/ui/switch";
-import { KeyValueConfig } from "./key-value-config";
+import { DiscriminatedUnion } from "./discriminated-unions";
+import { FunctionSchema } from "./function-schema";
+import { StringValidations } from "./string-validations";
 import type { SchemaField } from "@/lib/types";
 
 interface FieldBuilderProps {
@@ -53,6 +55,7 @@ export function FieldBuilder({ field, onChange }: FieldBuilderProps) {
               <SelectItem value="array">Array</SelectItem>
               <SelectItem value="object">Object</SelectItem>
               <SelectItem value="enum">Enum</SelectItem>
+              <SelectItem value="function">Function</SelectItem>
               <SelectItem value="bigint">BigInt</SelectItem>
               <SelectItem value="record">Record</SelectItem>
               <SelectItem value="map">Map</SelectItem>
@@ -84,22 +87,17 @@ export function FieldBuilder({ field, onChange }: FieldBuilderProps) {
         />
       )}
 
-      {(field.type === 'record' || field.type === 'map') && (
-        <KeyValueConfig field={field} onChange={onChange} />
+      {field.type === 'function' && (
+        <FunctionSchema field={field} onChange={onChange} />
       )}
 
-      <div className="flex items-center space-x-2">
-        <Switch
-          id={`is-async-${field.id}`}
-          checked={field.params.isAsync}
-          onCheckedChange={(checked) =>
-            onChange({
-              params: { ...field.params, isAsync: checked },
-            })
-          }
-        />
-        <Label htmlFor={`is-async-${field.id}`}>Async Validation</Label>
-      </div>
+      {field.params.isDiscriminatedUnion && (
+        <DiscriminatedUnion field={field} onChange={onChange} />
+      )}
+
+      {field.type === 'string' && (
+        <StringValidations field={field} onChange={onChange} />
+      )}
 
       <FieldParams
         field={field}

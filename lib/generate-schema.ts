@@ -1,5 +1,5 @@
 // lib/generate-schema.ts
-import type { SchemaField } from "./types";
+import type { SchemaField, FunctionParameter } from "./types";
 
 export function generateZodSchema(fields: SchemaField[]): string {
   if (fields.length === 0) {
@@ -28,6 +28,15 @@ function generateValidations(field: SchemaField): string {
   if (field.params.required_error) params.push(`required_error: "${field.params.required_error}"`);
 
   const paramsString = params.length ? `, { ${params.join(', ')} }` : '';
+
+  if (field.type === 'function') {
+    return generateFunctionSchema(field);
+  }
+
+  if (field.params.isDiscriminatedUnion) {
+    return generateDiscriminatedUnionSchema(field);
+  }
+
   let schema = '';
 
   switch (field.type) {
@@ -70,6 +79,8 @@ function generateValidations(field: SchemaField): string {
     case 'enum':
       if (field.params.enumValues?.length) {
         schema = `z.enum([${field.params.enumValues.map(v => `"${v}"`).join(', ')}]${paramsString})`;
+      } else {
+        schema = 'z.enum([])';
       }
       break;
 
@@ -89,6 +100,24 @@ function generateValidations(field: SchemaField): string {
       } else {
         schema = `z.${field.type}(${params.length ? `{ ${params.join(', ')} }` : ''})`;
       }
+      break;
+  }
+
+  // Add string-specific options if applicable
+  if (field.type === 'string') {
+    if (field.params.stringOptions?.datetime) {
+      const { offset, precision } = field.params.stringOptions.datetime;
+      const dtOptions: string[] = [];
+      if (offset) dtOptions.push('"offset": true');
+      if (precision !== undefined) dtOptions.push(`"precision": ${precision}`);
+      if (dtOptions.length > 0) {
+        schema += `.datetime({ ${dtOptions.join(', ')} })`;
+      }
+    }
+
+    if (field.params.stringOptions?.ip?.version) {
+      schema += `.ip({ version: "${field.params.stringOptions.ip.version}" })`;
+    }
   }
 
   // Add validations
@@ -112,10 +141,18 @@ function generateValidations(field: SchemaField): string {
         }
         break;
       case "min":
-        schema += `.min(${value}${addMessage})`;
+        if (field.type === 'bigint') {
+          schema += `.min(BigInt(${value})${addMessage})`;
+        } else {
+          schema += `.min(${value}${addMessage})`;
+        }
         break;
       case "max":
-        schema += `.max(${value}${addMessage})`;
+        if (field.type === 'bigint') {
+          schema += `.max(BigInt(${value})${addMessage})`;
+        } else {
+          schema += `.max(${value}${addMessage})`;
+        }
         break;
       case "length":
         schema += `.length(${value}${addMessage})`;
@@ -157,7 +194,11 @@ function generateValidations(field: SchemaField): string {
         schema += `.negative(${addMessage})`;
         break;
       case "multipleOf":
-        schema += `.multipleOf(${value}${addMessage})`;
+        if (field.type === 'bigint') {
+          schema += `.multipleOf(BigInt(${value})${addMessage})`;
+        } else {
+          schema += `.multipleOf(${value}${addMessage})`;
+        }
         break;
       case "finite":
         schema += `.finite(${addMessage})`;
@@ -170,41 +211,62 @@ function generateValidations(field: SchemaField): string {
         break;
       case "element":
         if (field.type === 'array' && !field.params.isTuple) {
-          const elementParams = params.length ? `, { ${params.join(', ')} }` : '';
-          schema = `z.array(z.${value}()${elementParams})`;
+          schema = `z.array(z.${value}()${paramsString})`;
         }
         break;
       case "async":
         schema += `.refine(async (val) => ${value}, ${addMessage})`;
         break;
-      case "min":
-        if (field.type === 'bigint') {
-          schema += `.min(BigInt(${value})${addMessage})`;
-        } else {
-          schema += `.min(${value}${addMessage})`;
-        }
+      case "cuid":
+        schema += `.cuid(${addMessage})`;
         break;
-      case "max":
-        if (field.type === 'bigint') {
-          schema += `.max(BigInt(${value})${addMessage})`;
-        } else {
-          schema += `.max(${value}${addMessage})`;
-        }
+      case "cuid2":
+        schema += `.cuid2(${addMessage})`;
         break;
-      case "multipleOf":
-        if (field.type === 'bigint') {
-          schema += `.multipleOf(BigInt(${value})${addMessage})`;
-        } else {
-          schema += `.multipleOf(${value}${addMessage})`;
-        }
+      case "ulid":
+        schema += `.ulid(${addMessage})`;
         break;
       case "size":
         if (field.type === 'set') {
           schema += `.size(${value}${addMessage})`;
         }
-        break;  
+        break;
     }
   });
 
   return schema;
+}
+
+function generateFunctionSchema(field: SchemaField): string {
+  const params = field.params.functionParams || [];
+  const returnType = field.params.returnType || 'void';
+
+  const args = params.map(param => generateFunctionParameter(param)).join(', ');
+
+  return `z.function()`
+    + (params.length ? `.args(${args})` : '')
+    + `.returns(z.${returnType}())`;
+}
+
+function generateFunctionParameter(param: FunctionParameter): string {
+  let schema = `z.${param.type}()`;
+  if (param.optional) {
+    schema += '.optional()';
+  }
+  return schema;
+}
+
+function generateDiscriminatedUnionSchema(field: SchemaField): string {
+  const discriminator = field.validations[0]?.discriminator || 'type';
+  const cases = field.validations[0]?.cases || {};
+
+  const caseSchemas = Object.entries(cases).map(([, fields]) => {
+    const innerSchema = fields
+      .map((f) => `    ${f.name}: ${generateValidations(f)}`)
+      .join(",\n");
+
+    return `  z.object({\n${innerSchema}\n  })`;
+  }).join(",\n");
+
+  return `z.discriminatedUnion("${discriminator}", [\n${caseSchemas}\n])`;
 }
