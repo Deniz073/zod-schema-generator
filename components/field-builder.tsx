@@ -11,6 +11,10 @@ import {
 } from "@/components/ui/select";
 import { ValidationBuilder } from "./validation-builder";
 import { FieldParams } from "./field-params";
+import { EnumValues } from "./enum-values";
+import { ArrayConfig } from "./array-config";
+import { ObjectConfig } from "./object-config";
+import { Switch } from "@/components/ui/switch";
 import type { SchemaField } from "@/lib/types";
 
 interface FieldBuilderProps {
@@ -47,9 +51,42 @@ export function FieldBuilder({ field, onChange }: FieldBuilderProps) {
               <SelectItem value="date">Date</SelectItem>
               <SelectItem value="array">Array</SelectItem>
               <SelectItem value="object">Object</SelectItem>
+              <SelectItem value="enum">Enum</SelectItem>
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {field.type === 'array' && (
+        <ArrayConfig field={field} onChange={onChange} />
+      )}
+
+      {field.type === 'object' && (
+        <ObjectConfig field={field} onChange={onChange} />
+      )}
+
+      {field.type === 'enum' && (
+        <EnumValues
+          values={field.params.enumValues || []}
+          onChange={(values) =>
+            onChange({
+              params: { ...field.params, enumValues: values }
+            })
+          }
+        />
+      )}
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id={`is-async-${field.id}`}
+          checked={field.params.isAsync}
+          onCheckedChange={(checked) =>
+            onChange({
+              params: { ...field.params, isAsync: checked },
+            })
+          }
+        />
+        <Label htmlFor={`is-async-${field.id}`}>Async Validation</Label>
       </div>
 
       <FieldParams

@@ -3,6 +3,8 @@ export interface ValidationRule {
   type: string;
   message: string;
   value: string;
+  transform?: string;
+  elementType?: string; 
 }
 
 export interface SchemaField {
@@ -15,5 +17,15 @@ export interface SchemaField {
     description?: string;
     invalid_type_error?: string;
     required_error?: string;
+    enumValues?: string[];
+    unionTypes?: string[];
+    isStrict?: boolean;
+    isPassthrough?: boolean;
+    pickOmitFields?: string[];
+    pickOmitType?: 'pick' | 'omit';
+    elementType?: string; 
+    isTuple?: boolean;
+    tupleTypes?: string[]; 
+    isAsync?: boolean;
   };
 }

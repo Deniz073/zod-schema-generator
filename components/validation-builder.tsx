@@ -35,6 +35,7 @@ export function ValidationBuilder({
         type: firstOption.value,
         message: "",
         value: "",
+        transform: "",
       },
     ]);
   };
@@ -63,7 +64,10 @@ export function ValidationBuilder({
         {validations.map((validation) => (
           <div
             key={validation.id}
-            className="grid grid-cols-[1fr,1fr,1fr,auto] gap-2 items-start"
+            className={`grid gap-2 items-start ${validation.type === "transform"
+                ? "grid-cols-[1fr,2fr,1fr,auto]"
+                : "grid-cols-[1fr,1fr,1fr,auto]"
+              }`}
           >
             <Select
               value={validation.type}
@@ -83,13 +87,23 @@ export function ValidationBuilder({
               </SelectContent>
             </Select>
 
-            <Input
-              value={validation.value}
-              onChange={(e) =>
-                updateValidation(validation.id, { value: e.target.value })
-              }
-              placeholder="Value"
-            />
+            {validation.type === "transform" ? (
+              <Input
+                value={validation.transform || ""}
+                onChange={(e) =>
+                  updateValidation(validation.id, { transform: e.target.value })
+                }
+                placeholder="Transform function (e.g., val.toLowerCase())"
+              />
+            ) : (
+              <Input
+                value={validation.value}
+                onChange={(e) =>
+                  updateValidation(validation.id, { value: e.target.value })
+                }
+                placeholder="Value"
+              />
+            )}
 
             <Input
               value={validation.message}
