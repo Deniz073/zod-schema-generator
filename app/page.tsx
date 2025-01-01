@@ -1,5 +1,3 @@
-import { SchemaBuilder } from "@/components/schema-builder";
-import { CodePreview } from "@/components/code-preview";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Code2, Wand2, Zap } from "lucide-react";
 import Link from "next/link";
