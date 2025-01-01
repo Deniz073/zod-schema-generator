@@ -1,5 +1,5 @@
 # Zod Schema Generator - Interactive Schema Builder with Real-time Preview
- a tool I built to make working with Zod schemas easier and more intuitive.
+ A tool I built to make working with Zod schemas easier and more intuitive.
 
 ## What is it?
 An interactive web-based generator that helps you build Zod validation schemas through a user-friendly interface. No more digging through docs or remembering the exact syntax - just configure your schema through the UI and get the code instantly.
