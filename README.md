@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zod Schema Generator - Interactive Schema Builder with Real-time Preview
+ a tool I built to make working with Zod schemas easier and more intuitive.
 
-## Getting Started
+## What is it?
+An interactive web-based generator that helps you build Zod validation schemas through a user-friendly interface. No more digging through docs or remembering the exact syntax - just configure your schema through the UI and get the code instantly.
 
-First, run the development server:
+# Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Full Type Support: From basic types (string, number, boolean) to complex ones (records, maps, discriminated unions)
+Advanced Validations: All Zod validations are supported with custom error messages
+Real-time Preview: See your schema code update as you build
+Modern UI: Clean, intuitive interface built with Next.js and shadcn/ui
+Copy-to-Clipboard: Get your schema code with one click
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Use Cases
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Perfect for quickly scaffolding complex schemas
+Great for learning Zod's features and capabilities
+Useful for exploring different validation combinations
+Helpful for teams standardizing their validation approaches
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Example Use
+Want to create a user schema with email validation, required fields, and custom error messages? Just:
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Add your fields
+Select types and validations
+Add custom error messages
+Copy the generated code
