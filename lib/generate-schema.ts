@@ -1,4 +1,3 @@
-// lib/generate-schema.ts
 import type { SchemaField, FunctionParameter } from "./types";
 
 export function generateZodSchema(fields: SchemaField[]): string {
@@ -15,8 +14,7 @@ export function generateZodSchema(fields: SchemaField[]): string {
     })
     .join(",\n");
 
-  return `${imports}const schema = z.object({\n${schemaFields}\n})${fields.some(f => f.params.isAsync) ? '.parseAsync' : '.parse'
-    };`;
+  return `${imports}const schema = z.object({\n${schemaFields}\n});`;
 }
 
 function generateValidations(field: SchemaField): string {
@@ -123,7 +121,7 @@ function generateValidations(field: SchemaField): string {
   // Add validations
   field.validations.forEach((validation) => {
     const { type, value, message, transform } = validation;
-    const addMessage = message ? `, { message: "${message}" }` : "";
+    const addMessage = message ? `{ message: "${message}" }` : "";
 
     switch (type) {
       case "optional":
@@ -142,20 +140,20 @@ function generateValidations(field: SchemaField): string {
         break;
       case "min":
         if (field.type === 'bigint') {
-          schema += `.min(BigInt(${value})${addMessage})`;
+          schema += `.min(BigInt(${value}), ${addMessage})`;
         } else {
-          schema += `.min(${value}${addMessage})`;
+          schema += `.min(${value}, ${addMessage})`;
         }
         break;
       case "max":
         if (field.type === 'bigint') {
-          schema += `.max(BigInt(${value})${addMessage})`;
+          schema += `.max(BigInt(${value}), ${addMessage})`;
         } else {
-          schema += `.max(${value}${addMessage})`;
+          schema += `.max(${value}, ${addMessage})`;
         }
         break;
       case "length":
-        schema += `.length(${value}${addMessage})`;
+        schema += `.length(${value}, ${addMessage})`;
         break;
       case "email":
         schema += `.email(${addMessage})`;
@@ -167,13 +165,13 @@ function generateValidations(field: SchemaField): string {
         schema += `.uuid(${addMessage})`;
         break;
       case "regex":
-        schema += `.regex(${value}${addMessage})`;
+        schema += `.regex(${value}, ${addMessage})`;
         break;
       case "startsWith":
-        schema += `.startsWith("${value}"${addMessage})`;
+        schema += `.startsWith("${value}", ${addMessage})`;
         break;
       case "endsWith":
-        schema += `.endsWith("${value}"${addMessage})`;
+        schema += `.endsWith("${value}", ${addMessage})`;
         break;
       case "trim":
         schema += `.trim()`;
@@ -195,9 +193,9 @@ function generateValidations(field: SchemaField): string {
         break;
       case "multipleOf":
         if (field.type === 'bigint') {
-          schema += `.multipleOf(BigInt(${value})${addMessage})`;
+          schema += `.multipleOf(BigInt(${value}), ${addMessage})`;
         } else {
-          schema += `.multipleOf(${value}${addMessage})`;
+          schema += `.multipleOf(${value}, ${addMessage})`;
         }
         break;
       case "finite":
@@ -228,7 +226,7 @@ function generateValidations(field: SchemaField): string {
         break;
       case "size":
         if (field.type === 'set') {
-          schema += `.size(${value}${addMessage})`;
+          schema += `.size(${value}, ${addMessage})`;
         }
         break;
     }

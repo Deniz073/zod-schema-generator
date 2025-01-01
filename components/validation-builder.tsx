@@ -65,8 +65,8 @@ export function ValidationBuilder({
           <div
             key={validation.id}
             className={`grid gap-2 items-start ${validation.type === "transform"
-                ? "grid-cols-[1fr,2fr,1fr,auto]"
-                : "grid-cols-[1fr,1fr,1fr,auto]"
+              ? "grid-cols-1 sm:grid-cols-[1fr,2fr,1fr,auto]"
+              : "grid-cols-1 sm:grid-cols-[1fr,1fr,1fr,auto]"
               }`}
           >
             <Select

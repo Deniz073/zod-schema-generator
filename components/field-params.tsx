@@ -1,4 +1,4 @@
-// components/field-params.tsx
+
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,6 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { SchemaField } from "@/lib/types";
+import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion";
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+
 
 interface FieldParamsProps {
   field: SchemaField;
@@ -51,52 +54,70 @@ export function FieldParams({ field, onChange }: FieldParamsProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id={`coerce-${field.id}`}
-          checked={field.params.coerce}
-          onCheckedChange={(checked) =>
-            onChange({ ...field.params, coerce: checked === true })
-          }
-        />
-        <Label htmlFor={`coerce-${field.id}`}>Coerce values</Label>
-      </div>
+      <Accordion type="single" collapsible className="w-full" defaultValue="3">
+        <AccordionItem value="datetime-ip" className="py-2">
+          <AccordionPrimitive.Header className="flex">
+            <AccordionPrimitive.Trigger className="flex flex-1 items-center gap-3 py-2 text-left text-[15px] font-semibold leading-6 transition-all [&>svg>path:last-child]:origin-center [&>svg>path:last-child]:transition-all [&>svg>path:last-child]:duration-200 [&>svg]:-order-1 [&[data-state=open]>svg>path:last-child]:rotate-90 [&[data-state=open]>svg>path:last-child]:opacity-0 [&[data-state=open]>svg]:rotate-180">
+              General
+              <Plus
+                size={16}
+                strokeWidth={2}
+                className="shrink-0 opacity-60 transition-transform duration-200"
+                aria-hidden="true"
+              />
+            </AccordionPrimitive.Trigger>
+          </AccordionPrimitive.Header>
+          <AccordionContent className="pb-2 space-y-3 ps-7">
+            <div className="flex items-center space-x-2 mt-2">
+              <Checkbox
+                id={`coerce-${field.id}`}
+                checked={field.params.coerce}
+                onCheckedChange={(checked) =>
+                  onChange({ ...field.params, coerce: checked === true })
+                }
+              />
+              <Label htmlFor={`coerce-${field.id}`}>Coerce values</Label>
+            </div>
 
-      <div className="space-y-2">
-        <Label htmlFor={`description-${field.id}`}>Description</Label>
-        <Input
-          id={`description-${field.id}`}
-          value={field.params.description || ""}
-          onChange={(e) =>
-            onChange({ ...field.params, description: e.target.value })
-          }
-          placeholder="Schema description"
-        />
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor={`description-${field.id}`}>Description</Label>
+              <Input
+                id={`description-${field.id}`}
+                value={field.params.description || ""}
+                onChange={(e) =>
+                  onChange({ ...field.params, description: e.target.value })
+                }
+                placeholder="Schema description"
+              />
+            </div>
 
-      <div className="space-y-2">
-        <Label htmlFor={`invalid-type-${field.id}`}>Invalid Type Error</Label>
-        <Input
-          id={`invalid-type-${field.id}`}
-          value={field.params.invalid_type_error || ""}
-          onChange={(e) =>
-            onChange({ ...field.params, invalid_type_error: e.target.value })
-          }
-          placeholder="Error when type is invalid"
-        />
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor={`invalid-type-${field.id}`}>Invalid Type Error</Label>
+              <Input
+                id={`invalid-type-${field.id}`}
+                value={field.params.invalid_type_error || ""}
+                onChange={(e) =>
+                  onChange({ ...field.params, invalid_type_error: e.target.value })
+                }
+                placeholder="Error when type is invalid"
+              />
+            </div>
 
-      <div className="space-y-2">
-        <Label htmlFor={`required-${field.id}`}>Required Error</Label>
-        <Input
-          id={`required-${field.id}`}
-          value={field.params.required_error || ""}
-          onChange={(e) =>
-            onChange({ ...field.params, required_error: e.target.value })
-          }
-          placeholder="Error when field is required but missing"
-        />
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor={`required-${field.id}`}>Required Error</Label>
+              <Input
+                id={`required-${field.id}`}
+                value={field.params.required_error || ""}
+                onChange={(e) =>
+                  onChange({ ...field.params, required_error: e.target.value })
+                }
+                placeholder="Error when field is required but missing"
+              />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
 
       {field.type !== 'enum' && (
         <div className="space-y-2">
