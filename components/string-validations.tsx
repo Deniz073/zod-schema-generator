@@ -72,10 +72,10 @@ export function StringValidations({ field, onChange }: StringValidationsProps) {
               />
             </AccordionPrimitive.Trigger>
           </AccordionPrimitive.Header>
-          <AccordionContent className="pb-2 ps-7">
-            <div className="space-y-2 mt-2 ">
+          <AccordionContent className="pb-2 ps-7 space-y-2">
+            <div className="space-y-2 mt-2">
               <Label>Datetime validation</Label>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                 <div className="flex items-center space-x-2">
                   <Switch
                     checked={field.params.stringOptions?.datetime?.offset || false}
@@ -83,8 +83,9 @@ export function StringValidations({ field, onChange }: StringValidationsProps) {
                       updateDatetimeOptions({ offset: checked })
                     }
                   />
-                  <Label>Allow Timezone Offset</Label>
+
                 </div>
+                <Label>Allow Timezone Offset</Label>
                 <Input
                   type="number"
                   value={field.params.stringOptions?.datetime?.precision || 0}
