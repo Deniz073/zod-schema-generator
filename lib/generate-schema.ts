@@ -255,12 +255,23 @@ function generateFunctionParameter(param: FunctionParameter): string {
 }
 
 function generateDiscriminatedUnionSchema(field: SchemaField): string {
-  const discriminator = field.validations[0]?.discriminator || 'type';
-  const cases = field.validations[0]?.cases || {};
+  const discriminatedUnion = field.params.discriminatedUnion;
+  if (!discriminatedUnion) return 'z.object({})';
 
-  const caseSchemas = Object.entries(cases).map(([, fields]) => {
+  const { discriminator, cases } = discriminatedUnion;
+
+  const caseSchemas = Object.entries(cases).map(([, caseData]) => {
+    const { value, fields } = caseData;
+
+    // Generate schemas for all fields including the discriminator
     const innerSchema = fields
-      .map((f) => `    ${f.name}: ${generateValidations(f)}`)
+      .map((f) => {
+        // Special handling for the discriminator field
+        if (f.name === discriminator) {
+          return `    ${discriminator}: z.literal("${value}")`;
+        }
+        return `    ${f.name}: ${generateValidations(f)}`;
+      })
       .join(",\n");
 
     return `  z.object({\n${innerSchema}\n  })`;

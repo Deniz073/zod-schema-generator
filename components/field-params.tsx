@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,7 +16,6 @@ import type { SchemaField } from "@/lib/types";
 import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 
-
 interface FieldParamsProps {
   field: SchemaField;
   onChange: (params: SchemaField["params"]) => void;
@@ -26,7 +24,7 @@ interface FieldParamsProps {
 export function FieldParams({ field, onChange }: FieldParamsProps) {
   const addUnionType = () => {
     const currentTypes = field.params.unionTypes || [];
-    if (currentTypes.length < 5) { // Limit to 5 union types for simplicity
+    if (currentTypes.length < 5) {
       onChange({
         ...field.params,
         unionTypes: [...currentTypes, "string"],
@@ -118,8 +116,7 @@ export function FieldParams({ field, onChange }: FieldParamsProps) {
         </AccordionItem>
       </Accordion>
 
-
-      {field.type !== 'enum' && (
+      {field.type !== 'enum' && !field.params.isDiscriminatedUnion && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label>Union Types</Label>

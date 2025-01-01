@@ -3,9 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { FieldBuilder } from "./field-builder";
 import type { SchemaField } from "@/lib/types";
+import { Card } from "@/components/ui/card";
 
 interface DiscriminatedUnionProps {
   field: SchemaField;
@@ -29,7 +30,15 @@ export function DiscriminatedUnion({ field, onChange }: DiscriminatedUnionProps)
             ...discriminatedUnion.cases,
             [caseKey]: {
               value: caseKey,
-              fields: [],
+              fields: [
+                {
+                  id: crypto.randomUUID(),
+                  name: discriminatedUnion.discriminator,
+                  type: 'string',
+                  validations: [],
+                  params: {},
+                }
+              ],
             },
           },
         },
@@ -63,8 +72,22 @@ export function DiscriminatedUnion({ field, onChange }: DiscriminatedUnionProps)
     });
   };
 
+  const removeCase = (key: string) => {
+    const newCases = { ...discriminatedUnion.cases };
+    delete newCases[key];
+    onChange({
+      params: {
+        ...field.params,
+        discriminatedUnion: {
+          ...discriminatedUnion,
+          cases: newCases,
+        },
+      },
+    });
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="pb-2 space-y-4">
       <div className="space-y-2">
         <Label>Discriminator Field</Label>
         <Input
@@ -94,37 +117,48 @@ export function DiscriminatedUnion({ field, onChange }: DiscriminatedUnionProps)
         </div>
 
         {Object.entries(discriminatedUnion.cases).map(([key, caseData]) => (
-          <div key={key} className="border rounded-lg p-4 space-y-4">
+          <Card key={key} className="p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <Input
-                value={caseData.value}
-                onChange={(e) =>
-                  onChange({
-                    params: {
-                      ...field.params,
-                      discriminatedUnion: {
-                        ...discriminatedUnion,
-                        cases: {
-                          ...discriminatedUnion.cases,
-                          [key]: {
-                            ...caseData,
-                            value: e.target.value,
+              <div className="flex-1 mr-4">
+                <Input
+                  value={caseData.value}
+                  onChange={(e) =>
+                    onChange({
+                      params: {
+                        ...field.params,
+                        discriminatedUnion: {
+                          ...discriminatedUnion,
+                          cases: {
+                            ...discriminatedUnion.cases,
+                            [key]: {
+                              ...caseData,
+                              value: e.target.value,
+                            },
                           },
                         },
                       },
-                    },
-                  })
-                }
-                placeholder="Case value"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => addField(key)}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Field
-              </Button>
+                    })
+                  }
+                  placeholder="Case value"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addField(key)}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Field
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeCase(key)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
             {caseData.fields.map((subField, index) => (
@@ -152,7 +186,7 @@ export function DiscriminatedUnion({ field, onChange }: DiscriminatedUnionProps)
                 }
               />
             ))}
-          </div>
+          </Card>
         ))}
       </div>
     </div>
